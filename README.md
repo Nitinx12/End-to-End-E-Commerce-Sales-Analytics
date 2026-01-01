@@ -1,66 +1,41 @@
-# E-Commerce Sales Analytics Project
+# E-Commerce Analytics Pipeline
 
-## Project Overview
-This project implements an end-to-end data pipeline and analytical suite for an e-commerce platform. It demonstrates the extraction, transformation, and loading (ETL) of transactional data into a PostgreSQL database, followed by advanced SQL analytics and Python-based exploratory data analysis (EDA). The goal is to derive actionable business insights regarding revenue trends, customer lifecycle, and product performance.
+## Description
+This project implements an end-to-end data analysis pipeline for an e-commerce platform. It focuses on ingesting raw transactional data, performing advanced SQL-based analytics, and generating visual insights regarding customer behavior and revenue trends.
 
-## Repository Structure
-* **Load into pg adminn.py**: Python ETL script that ingests raw CSV data (`Customers`, `Products`, `Transactions`), performs necessary transformations using Pandas, and loads the data into a PostgreSQL database using SQLAlchemy.
-* **SQL E-Commerce.sql**: Comprehensive SQL script containing advanced queries for time-series analysis, customer segmentation (RFM-style), and revenue growth metrics.
-* **E-Commerce NoteBook.ipynb**: Jupyter Notebook focused on visual exploratory data analysis, including Pareto analysis (80/20 rule) and statistical distributions of sales data.
-* **Data Files**:
-    * `customer.csv`: Contains customer demographics and signup dates.
-    * `products.csv`: Product catalog including categories and pricing.
-    * `Transactions.csv`: Transactional sales records.
+The system is designed to transform raw CSV logs into actionable business intelligence, specifically solving problems related to Customer Lifetime Value (CLV) calculation, customer segmentation (Active vs. Dormant), and sales growth tracking.
 
-## Technologies Used
-* **Database**: PostgreSQL
-* **Programming Languages**: Python, SQL
-* **Python Libraries**: Pandas, SQLAlchemy, Matplotlib, Seaborn, NumPy, DuckDB
-* **Tools**: PGAdmin, Jupyter Notebook
+**Key capabilities include:**
+* **ETL Process:** Automated loading of flat-file data into a relational database.
+* **Customer Intelligence:** Analysis of purchasing habits, category preferences, and recency.
+* **Revenue Analysis:** Month-over-Month (MoM) growth calculations and Pareto analysis (80/20 rule).
 
-## Database Schema
-The project uses a relational schema with the following specifications:
-1.  **Customers Table**: Stores `customerid`, `customername`, `region`, and `signupdate`.
-2.  **Products Table**: Stores `productid`, `productname`, `category`, and `price`.
-3.  **Transactions Table**: Stores `transactionid`, foreign keys to customers and products, `transactiondate`, `quantity`, `totalvalue`, and `price`.
+## Features
+* **Automated Data Ingestion:** Python-based script to bulk load Customers, Products, and Transactions data into PostgreSQL.
+* **Advanced SQL Analytics:**
+    * Recursive CTEs for daily revenue tracking.
+    * Window functions for calculating Month-over-Month growth percentage.
+    * Customer segmentation logic based on purchase recency (Active, Dormant, Churned).
+* **Exploratory Data Analysis (EDA):** Jupyter Notebook integration for visual statistical analysis, including revenue distribution and category performance.
+* **Category Ranking:** Logic to identify the "favorite" product category for every unique customer.
 
-## Key Analytical Features
+## Tech Stack
+* **Languages:** Python 3.x, SQL
+* **Database:** PostgreSQL
+* **Data Manipulation:** Pandas, NumPy
+* **Visualization:** Matplotlib, Seaborn
+* **ORM/Database Connectivity:** SQLAlchemy, DuckDB
 
-### 1. SQL Analytics (`SQL E-Commerce.sql`)
-* **Time-Series Analysis**: Implementation of recursive CTEs to generate continuous calendar dates for daily revenue tracking, ensuring no gaps in reporting.
-* **Growth Metrics**: Calculation of Month-over-Month (MoM) growth percentages using window functions (`LAG`, `OVER`).
-* **Customer Segmentation**: Logic to classify customers as 'Active' or 'Dormant' based on recency of their last purchase (e.g., < 90 days vs. > 180 days).
-* **Lifetime Value (LTV)**: Aggregation of total spend per customer to identify high-value clients.
-
-### 2. Exploratory Data Analysis (`E-Commerce NoteBook.ipynb`)
-* **Pareto Principle Application**: Analysis identifying the top percentile of customers responsible for 80% of revenue.
-* **Category Performance**: Visualization of sales distribution across different product categories.
-* **Regional Insights**: Breakdown of customer base and purchasing power by region.
-
-## Setup and Usage Instructions
-
-### Prerequisites
-* Python 3.x installed.
-* PostgreSQL installed and running locally.
-
-### Installation
-1.  Clone this repository.
-2.  Install required Python packages:
-    ```bash
-    pip install pandas sqlalchemy psycopg2 matplotlib seaborn numpy
-    ```
-
-### Database Initialization
-1.  Create a database named `Online` (or update the connection string in the Python script).
-2.  Open `Load into pg adminn.py` and configure your database credentials:
-    ```python
-    conn_string = 'postgresql://username:password@localhost/Online'
-    ```
-3.  Run the script to load data:
-    ```bash
-    python "Load into pg adminn.py"
-    ```
-
-### Running Analysis
-* **SQL**: Execute the queries in `SQL E-Commerce.sql` using a tool like PGAdmin or DBeaver to view tabular insights.
-* **Python**: Launch Jupyter Notebook to run `E-Commerce NoteBook.ipynb` for visual reports.
+## Project Structure
+```text
+├── data/
+│   ├── customer.csv          # Raw customer demographic data
+│   ├── products.csv          # Product catalog and pricing
+│   └── Transactions.csv      # Historical transaction logs
+├── notebooks/
+│   └── E-Commerce NoteBook.ipynb  # EDA and visual analysis
+├── scripts/
+│   └── Load into pg adminn.py     # ETL script for database population
+├── sql/
+│   └── SQL E-Commerce.sql    # Analytical queries and business logic
+└── README.md
