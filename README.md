@@ -70,4 +70,4 @@ Complex SQL queries were engineered to derive deeper insights:
 Contributions, issues, and feature requests are welcome! Feel free to check the [issues page](https://github.com/yourusername/ecommerce-eda/issues).
 
 ---
-*Author: [Your Name]*
+*Author: Nitin KS*
