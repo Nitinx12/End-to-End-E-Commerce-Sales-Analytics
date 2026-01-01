@@ -99,3 +99,15 @@ Key visualizations generated in the notebook include:
     * Execute scripts in `SQL E-Commerce.sql` in your SQL client for database-side analysis.
 
 ## 📂 Repository Structure
+├── data/
+│   ├── customer.csv          # Raw customer demographic data
+│   ├── products.csv          # Product catalog and pricing
+│   └── Transactions.csv      # Historical transaction logs
+├── notebooks/
+│   └── E-Commerce NoteBook.ipynb  # EDA, Pareto analysis, and visualizations
+├── scripts/
+│   └── Load into pg adminn.py     # Python script to load CSVs into PostgreSQL
+├── sql/
+│   └── SQL E-Commerce.sql         # SQL queries for KPIs and segmentation
+├── README.md                 # Project documentation
+└── requirements.txt          # Python dependencies (placeholder)
