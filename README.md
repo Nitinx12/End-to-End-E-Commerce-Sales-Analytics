@@ -1,89 +1,66 @@
-# 🛒 End-to-End E-Commerce Sales Analysis & Customer Segmentation
+# E-Commerce Data Engineering and Analysis Project
 
-![SQL](https://img.shields.io/badge/Language-SQL-orange) ![PostgreSQL](https://img.shields.io/badge/Database-PostgreSQL-blue) ![Status](https://img.shields.io/badge/Status-Complete-green)
+## Project Overview
+This project implements an end-to-end data pipeline and analytical suite for an e-commerce platform. It demonstrates the extraction, transformation, and loading (ETL) of transactional data into a PostgreSQL database, followed by advanced SQL analytics and Python-based exploratory data analysis (EDA). The goal is to derive actionable business insights regarding revenue trends, customer lifecycle, and product performance.
 
-## 📖 Project Overview
-This project simulates a real-world analytics scenario for a fictional E-Commerce retailer. Using **PostgreSQL**, I analyzed over 1,000 transaction records to solve critical business questions regarding sales trends, customer behavior, and product performance.
+## Repository Structure
+* **Load into pg adminn.py**: Python ETL script that ingests raw CSV data (`Customers`, `Products`, `Transactions`), performs necessary transformations using Pandas, and loads the data into a PostgreSQL database using SQLAlchemy.
+* **SQL E-Commerce.sql**: Comprehensive SQL script containing advanced queries for time-series analysis, customer segmentation (RFM-style), and revenue growth metrics.
+* **E-Commerce NoteBook.ipynb**: Jupyter Notebook focused on visual exploratory data analysis, including Pareto analysis (80/20 rule) and statistical distributions of sales data.
+* **Data Files**:
+    * `customer.csv`: Contains customer demographics and signup dates.
+    * `products.csv`: Product catalog including categories and pricing.
+    * `Transactions.csv`: Transactional sales records.
 
-The goal was to move beyond basic aggregation and demonstrate advanced SQL capabilities like **Window Functions**, **CTEs**, **Time-Series Analysis**, and **Customer Segmentation**.
+## Technologies Used
+* **Database**: PostgreSQL
+* **Programming Languages**: Python, SQL
+* **Python Libraries**: Pandas, SQLAlchemy, Matplotlib, Seaborn, NumPy, DuckDB
+* **Tools**: PGAdmin, Jupyter Notebook
 
----
+## Database Schema
+The project uses a relational schema with the following specifications:
+1.  **Customers Table**: Stores `customerid`, `customername`, `region`, and `signupdate`.
+2.  **Products Table**: Stores `productid`, `productname`, `category`, and `price`.
+3.  **Transactions Table**: Stores `transactionid`, foreign keys to customers and products, `transactiondate`, `quantity`, `totalvalue`, and `price`.
 
-## 📂 The Dataset
-The project operates on a Star Schema consisting of three joined tables:
-1.  **`Transactions`**: Order-level data (Order ID, Date, Quantity, Total Value).
-2.  **`Customers`**: Demographics (Customer ID, Name, Region, Sign-up Date).
-3.  **`Products`**: Inventory details (Product ID, Category, Price).
+## Key Analytical Features
 
----
+### 1. SQL Analytics (`SQL E-Commerce.sql`)
+* **Time-Series Analysis**: Implementation of recursive CTEs to generate continuous calendar dates for daily revenue tracking, ensuring no gaps in reporting.
+* **Growth Metrics**: Calculation of Month-over-Month (MoM) growth percentages using window functions (`LAG`, `OVER`).
+* **Customer Segmentation**: Logic to classify customers as 'Active' or 'Dormant' based on recency of their last purchase (e.g., < 90 days vs. > 180 days).
+* **Lifetime Value (LTV)**: Aggregation of total spend per customer to identify high-value clients.
 
-## 🔍 Key Business Problems Solved
+### 2. Exploratory Data Analysis (`E-Commerce NoteBook.ipynb`)
+* **Pareto Principle Application**: Analysis identifying the top percentile of customers responsible for 80% of revenue.
+* **Category Performance**: Visualization of sales distribution across different product categories.
+* **Regional Insights**: Breakdown of customer base and purchasing power by region.
 
-### 1. Changes Over Time Analysis (Time-Series)
-* **Goal:** Track growth volatility and smooth out daily noise.
-* **Techniques:** `LAG()`, `DATE_TRUNC()`, Rolling Averages.
-* **Key Insight:** Calculated Month-over-Month (MoM) growth and identified a 29% sales dip in Q4 compared to Q3.
+## Setup and Usage Instructions
 
-### 2. Cumulative Analysis (Growth Tracking)
-* **Goal:** Visualize progress toward monthly and annual targets.
-* **Techniques:** Window Sums `SUM() OVER(ORDER BY...)`, Partitioning.
-* **Key Insight:** Built a "Running Total" report that resets monthly to track "Burn Rate" performance.
+### Prerequisites
+* Python 3.x installed.
+* PostgreSQL installed and running locally.
 
-### 3. Performance Ranking (Pareto & Best Sellers)
-* **Goal:** Identify the 20% of products driving 80% of revenue.
-* **Techniques:** `DENSE_RANK()`, `NTILE()`, Pareto Logic.
-* **Key Insight:** Identified the Top 3 "Best Sellers" within each specific category (Books, Electronics, etc.) to optimize inventory stocking.
+### Installation
+1.  Clone this repository.
+2.  Install required Python packages:
+    ```bash
+    pip install pandas sqlalchemy psycopg2 matplotlib seaborn numpy
+    ```
 
-### 4. Customer Segmentation (RFM Analysis)
-* **Goal:** Classify users into actionable marketing buckets (VIP, Churn Risk).
-* **Techniques:** `CASE WHEN`, Date Math (`CURRENT_DATE - Last_Order`).
-* **Key Insight:** Segmented customers into **VIP**, **Loyal**, and **At-Risk** groups based on spending thresholds and inactivity days (>90 days).
+### Database Initialization
+1.  Create a database named `Online` (or update the connection string in the Python script).
+2.  Open `Load into pg adminn.py` and configure your database credentials:
+    ```python
+    conn_string = 'postgresql://username:password@localhost/Online'
+    ```
+3.  Run the script to load data:
+    ```bash
+    python "Load into pg adminn.py"
+    ```
 
----
-
-## 💻 SQL Techniques Demonstrated
-This project showcases the following advanced SQL skills:
-
-* **Window Functions:** `RANK`, `DENSE_RANK`, `ROW_NUMBER`, `LAG`, `LEAD`, `NTILE`.
-* **Advanced Aggregation:** Moving Averages (7-day), Running Totals.
-* **Date Manipulation:** `DATE_TRUNC`, Interval math for Churn calculation.
-* **Complex Logic:** `CASE WHEN` for dynamic segmentation.
-* **Optimization:** Using Common Table Expressions (CTEs) for readability and modularity.
-
----
-
-## 📊 Sample Analysis: Customer 360 Master Report
-*Constructing a "Single View" of the customer for the CRM team.*
-
-```sql
-WITH Customer_Stats AS (
-    SELECT 
-        customerid,
-        SUM(totalvalue) AS lifetime_value,
-        COUNT(transactionid) AS total_orders,
-        MAX(transactiondate) AS last_order_date
-    FROM transactions
-    GROUP BY 1
-),
-Customer_Fav AS (
-    SELECT 
-        customerid, category,
-        ROW_NUMBER() OVER(PARTITION BY customerid ORDER BY SUM(totalvalue) DESC) AS rnk
-    FROM transactions t
-    JOIN products p ON t.productid = p.productid
-    GROUP BY 1, 2
-)
-SELECT 
-    c.customername,
-    cs.lifetime_value,
-    CASE 
-        WHEN cs.lifetime_value > 5000 THEN 'Platinum'
-        WHEN cs.lifetime_value > 2500 THEN 'Gold'
-        ELSE 'Silver'
-    END AS loyalty_tier,
-    cf.category AS favorite_category
-FROM Customer_Stats cs
-JOIN customers c ON cs.customerid = c.customerid
-JOIN Customer_Fav cf ON cs.customerid = cf.customerid
-WHERE cf.rnk = 1
-ORDER BY cs.lifetime_value DESC;
+### Running Analysis
+* **SQL**: Execute the queries in `SQL E-Commerce.sql` using a tool like PGAdmin or DBeaver to view tabular insights.
+* **Python**: Launch Jupyter Notebook to run `E-Commerce NoteBook.ipynb` for visual reports.
