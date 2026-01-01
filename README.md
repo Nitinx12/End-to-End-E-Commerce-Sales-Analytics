@@ -1,4 +1,4 @@
-# E-Commerce Data Engineering and Analysis Project
+# E-Commerce Sales Analytics Project
 
 ## Project Overview
 This project implements an end-to-end data pipeline and analytical suite for an e-commerce platform. It demonstrates the extraction, transformation, and loading (ETL) of transactional data into a PostgreSQL database, followed by advanced SQL analytics and Python-based exploratory data analysis (EDA). The goal is to derive actionable business insights regarding revenue trends, customer lifecycle, and product performance.
